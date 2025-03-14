@@ -1,6 +1,5 @@
 """Searxng via MCP for LLMs."""
 
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -94,8 +93,3 @@ async def search_tool(message: str) -> str:
     """Search online for information via Searxng."""
     result: str = await search_searxng(query=message)
     return result
-
-if __name__ == "__main__":
-    import asyncio
-
-    print(asyncio.run(main=search_searxng(query=sys.argv[1])))
