@@ -92,7 +92,6 @@ mcp = FastMCP(name="Searxng via MCP", dependencies=["toml"])
 @mcp.tool()
 async def search_tool(message: str) -> str:
     """Search online for information via Searxng."""
-    print(f'{message}', file=sys.stderr)
     result: str = await search_searxng(query=message)
     return result
 
