@@ -1,6 +1,11 @@
 """Searxng via MCP for LLMs."""
 
-from httpx import AsyncClient
+import sys
+from pathlib import Path
+from typing import Any
+
+import toml
+from httpx import AsyncClient, Response
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
 
@@ -29,7 +34,7 @@ class Infobox(BaseModel):
     urls: list[InfoboxUrl]
 
 
-class Response(BaseModel):
+class SearchResponse(BaseModel):
     """Response model."""
 
     query: str
@@ -40,18 +45,26 @@ class Response(BaseModel):
 
 async def search_searxng(query: str, limit: int = 10) -> str:
     """Search searxng."""
-    client = AsyncClient(base_url="https://hetzner.tail9e5e41.ts.net:8443/searxng")
+    searxng_url = "http://localhost:8888"
+
+    config_path: Path = Path().home() / ".mcp.toml"
+    if config_path.exists():
+        with open(file=config_path, encoding="utf-8") as f:
+            config: dict[str, Any] = toml.load(f=f)
+            if "searxng" in config:
+                searxng_url: str = config["searxng"]["url"]
+    client = AsyncClient(base_url=searxng_url)
 
     params: dict[str, str] = {"q": query, "format": "json"}
 
-    response = await client.get("/search", params=params)
+    response: Response = await client.get(url="/search", params=params)
     response.raise_for_status()
 
-    data = Response.model_validate_json(response.text)
+    data: SearchResponse = SearchResponse.model_validate_json(json_data=response.text)
 
     text: str = ""
 
-    for _index, infobox in enumerate(data.infoboxes):
+    for _index, infobox in enumerate(iterable=data.infoboxes):
         text += f"Infobox: {infobox.infobox}\n"
         text += f"ID: {infobox.id}\n"
         text += f"Content: {infobox.content}\n"
@@ -60,7 +73,7 @@ async def search_searxng(query: str, limit: int = 10) -> str:
     if len(data.results) == 0:
         text += "No results found\n"
 
-    for index, result in enumerate(data.results):
+    for index, result in enumerate(iterable=data.results):
         text += f"Title: {result.title}\n"
         text += f"URL: {result.url}\n"
         text += f"Content: {result.content}\n"
@@ -73,11 +86,17 @@ async def search_searxng(query: str, limit: int = 10) -> str:
 
 
 # Create a named server
-mcp = FastMCP("Searxng via MCP")
+mcp = FastMCP(name="Searxng via MCP", dependencies=["toml"])
 
 
 @mcp.tool()
 async def search_tool(message: str) -> str:
     """Search online for information via Searxng."""
-    result = await search_searxng(message)
+    print(f'{message}', file=sys.stderr)
+    result: str = await search_searxng(query=message)
     return result
+
+if __name__ == "__main__":
+    import asyncio
+
+    print(asyncio.run(main=search_searxng(query=sys.argv[1])))
