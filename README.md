@@ -1,5 +1,7 @@
 # Search for the Claude.ai app
 
+I wanted to try MCP and used the repository [MCP-searxng](https://github.com/SecretiveShell/MCP-searxng) by [SecretiveShell](https://github.com/SecretiveShell) as a starting point.
+
 Install
 
 ```bash
