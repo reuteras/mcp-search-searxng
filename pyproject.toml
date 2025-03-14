@@ -1,0 +1,81 @@
+[project]
+name = "mcp-search-searxng"
+version = "0.1.0"
+description = "Simple tool to add search to Claude.ai App via MCP"
+readme = "README.md"
+authors = [
+    { name = "Peter Reuterås", email = "peter@reuteras.net" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+]
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.4.0",
+]
+
+[project.scripts]
+mcp-search-searxng = "mcp_search_searxng:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.urls]
+Homepage = "https://github.com/reuteras/mcp-search-searxng"
+Issues = "https://github.com/reuteras/mcp-search-searxng/issues"
+
+[dependency-groups]
+dev = [
+    "pylint>=3.3.4",
+    "ruff>=0.9.5",
+]
+
+[tool.ruff]
+target-version = "py311"
+lint.select = [
+    "PL",   # Pylint
+    "F",    # pyflakes
+    "I",    # isort
+    "D",    # pydocstyle
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "RUF",  # Ruff-specific
+]
+lint.ignore = [
+    "E501",  # line too long, handled by black
+]
+fix = true
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.pydocstyle]
+convention="google"
