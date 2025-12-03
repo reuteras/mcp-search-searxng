@@ -1,9 +1,9 @@
 """Searxng via MCP for LLMs."""
 
+import tomllib
 from pathlib import Path
 from typing import Any
 
-import toml
 from httpx import AsyncClient, Response
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
@@ -49,7 +49,7 @@ async def search_searxng(query: str, limit: int = 10) -> str:
     config_path: Path = Path().home() / ".mcp.toml"
     if config_path.exists():
         with open(file=config_path, encoding="utf-8") as f:
-            config: dict[str, Any] = toml.load(f=f)
+            config: dict[str, Any] = tomllib.load(f=f)
             if "searxng" in config:
                 searxng_url: str = config["searxng"]["url"]
     client = AsyncClient(base_url=searxng_url)
@@ -85,7 +85,7 @@ async def search_searxng(query: str, limit: int = 10) -> str:
 
 
 # Create a named server
-mcp = FastMCP(name="Searxng via MCP", dependencies=["toml"])
+mcp = FastMCP(name="Searxng via MCP")
 
 
 @mcp.tool()
